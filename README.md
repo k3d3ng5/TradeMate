@@ -1,7 +1,5 @@
 # TradeMate AI
 
-The operational signal rules, WAT sessions, supported evidence, confidence-score meaning, and live-data limits are defined in [TRADE_RULES.md](TRADE_RULES.md). The maintained signal logic is `src/trademate/strategy.py`; the root-level `crt_tsq_execution_engine_v2.py` is a retired prototype and is not used by the Telegram bot.
-
 TradeMate AI is a private Telegram companion for careful market analysis,
 beginner-friendly trade planning, and trading education. It helps review risk
 and exit plans, but it does not place, change, or manage trades in the broker.
@@ -12,7 +10,7 @@ evaluates the deterministic strategy rules for recognized currency pairs, gold, 
 symbols. It reports a signal, a confidence score based on confirmed conditions,
 and the WAT check time. It only shows entry, stop, and targets when
 all required setup and risk/reward checks pass. Binance BTC/USDT is available
-for snapshots. Analysis uses the connected MT5 symbol, including BTC/USD when it is listed in Market Watch. Market Scan and Alerts prioritize EURUSD, GBPUSD, XAUUSD, and BTCUSD and run during the London (07:00–11:00 WAT) and New York (13:00–17:00 WAT) windows. The broker’s exact symbol must be available in MT5 Market Watch. Missing,
+for snapshots. Analysis uses the connected MT5 symbol, including BTC/USD when it is listed in Market Watch. Market Scan and Alerts prioritize EURUSD, GBPUSD, XAUUSD, and BTCUSD and run during the London and New York windows. The broker’s exact symbol must be available in MT5 Market Watch. Missing,
 stale, or incomplete data causes the analysis to fail closed instead of guessing.
 
 The Risk Manager has two routes. For the latest complete signal, it refreshes the setup,
@@ -38,20 +36,14 @@ regular use.
 
 - A computer with Python 3.10 or newer.
 - A Telegram account.
-- A free bot token from Telegram's **@BotFather**.
-- Your numeric Telegram user ID, so the bot can be kept private.
-- For MT5 prices: MetaTrader 5 desktop terminal, connected to a broker demo
-  account, on the same Windows computer that runs this bot.
-- If you do not have the terminal, get the official Windows download from
-  [MetaTrader 5](https://www.metatrader5.com/en). A demo account must be
-  available from the broker you choose.
+- Your numeric Telegram user ID.
+- Prices terminal: A terminal, connected to a broker account, on the same Windows computer that runs this system.
 
 No market-data subscription or AI service is needed for this phase.
 
 ## Set it up on Windows
 
-1. Open Telegram, search for **@BotFather**, and follow its instructions to
-   create a bot. Copy the token it gives you. Keep the token private.
+1. Open Telegram, and follow its instructions to create a bot. Copy the token it gives you. Keep the token private.
 2. Find your numeric Telegram user ID using a trusted Telegram ID lookup bot.
    Treat it like an address for the allowlist; it is not your password.
 3. Open PowerShell in this project folder and run:
@@ -66,14 +58,14 @@ No market-data subscription or AI service is needed for this phase.
 
 4. In `.env`, replace the example values with your bot token and numeric user
    ID. Leave `TRADEMATE_DEV_MODE=false` for normal private use. Save the file.
-5. Start the bot:
+5. Start bot:
 
    ```powershell
    $env:PYTHONPATH = "src"
    python -m trademate
    ```
 
-6. Open MT5 and sign in to a demo account. Find the instrument name in Market
+6. Open your broker account. Find the instrument name in Market
    Watch, then try `/market EURUSD` or `/analyze EURUSD` in Telegram, replacing
    `EURUSD` with the exact name shown by your broker.
    Leave the PowerShell window open while you use it. Press `Ctrl+C` to stop
@@ -90,15 +82,14 @@ with `$env:PYTHONPATH = "src"; .\.venv\Scripts\python.exe -m trademate`.
 - Keep `TRADEMATE_DEV_MODE=false` outside a brief local setup session. When
   development mode is on and the allowlist is empty, anyone who finds the bot
   can message it.
-- If a token is accidentally shared, ask @BotFather to revoke it and create a
-  replacement.
+- If a token is accidentally shared, revoke it.
 
 ## Current market-data limits
 
-MT5 prices come from the selected broker's demo feed. Each broker chooses its
+prices come from the selected broker's feed. Each broker chooses its
 own instruments, names, trading hours, and quote details, so the same symbol may
 not match another broker or exchange. The bot reads the terminal's bid and ask
-and displays their midpoint. MT5 must be installed and connected on the same
+and displays their midpoint. broker must be installed and connected on the same
 Windows computer that runs the bot. The connector reads prices and candles; it
 does not send orders.
 
