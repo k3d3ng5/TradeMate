@@ -1,6 +1,6 @@
 # TradeMate AI — Product Requirements Document (PRD)
 **Version:** 1.0  
-**Status:** Implementation-ready specification for OpenCode  
+**Status:** Implementation-ready specific
 **Product type:** Private, multi-market trading intelligence and decision-support assistant  
 **Primary interface:** Telegram  
 **Core engine:** Python  
@@ -15,18 +15,6 @@ TradeMate AI is a private trading companion that retrieves market data, applies 
 TradeMate is not an autonomous trading bot. It must not place, modify, or close live trades. It must not claim that a setup is guaranteed to win. Its job is to help the user analyse markets consistently, understand the evidence, control risk, and learn from recorded results.
 
 **Product promise:** See the market. Understand the setup. Control the risk. Learn from every trade.
-
-## 2. Confirmed product decisions
-
-- **Markets in V1:** Forex and gold; cryptocurrency; stocks and ETFs.
-- **Strategy:** Start with the user's defined multi-timeframe strategy. Do not invent a separate strategy for each market in V1. Use strategy applicability/configuration rules and clearly report when a market or instrument is not supported by the strategy.
-- **Delivery:** Telegram bot.
-- **Main engine:** Python script/application. n8n is not required for core functionality.
-- **Execution:** Analyse and notify only. User places trades manually.
-- **Initial deployment:** Local development first; deploy later to a persistent host.
-- **Initial user:** One private user. Design clean interfaces so multi-user support can be added later, but do not build public SaaS complexity into V1.
-- **AI role:** Explain structured analysis in natural language; do not let an LLM invent market data, levels, entries, or strategy outcomes.
-- **Data and broker credentials:** Use environment variables; never commit secrets.
 
 ## 3. Goals and non-goals
 
@@ -94,35 +82,6 @@ The engine must not use forex lot-size assumptions for crypto or stocks. Positio
 
 ### 6.1 Strategy philosophy
 Implement the user's defined strategy as a deterministic rules engine. Keep the strategy configurable and separated from Telegram handlers, data providers, and AI explanation.
-
-### 6.2 Initial multi-timeframe framework
-- **4H:** directional bias — bullish, bearish, or neutral, using the configured candle/structure rule.
-- **1H:** market structure and important levels.
-- **15M:** setup development, including relevant liquidity levels, sweep, rejection, and confirmation.
-- **1M:** entry trigger, if supported by the provider and enabled for the instrument.
-
-Relevant levels may include:
-- Previous Day High (PDH)
-- Previous Day Low (PDL)
-- Asian Session High
-- Asian Session Low
-- configured higher-timeframe swing highs/lows and areas of interest
-
-The Asian session window and timezone must be configurable. The system must not silently assume the machine's local timezone. Default timezone should be configurable and initially set to `Africa/Lagos` for user-facing time; strategy session boundaries must be explicit in configuration.
-
-### 6.3 Rules and conditions
-The initial strategy module should support configurable checks such as:
-- higher-timeframe bias
-- level proximity
-- liquidity sweep beyond a defined level
-- close back inside/beyond the level as configured
-- rejection candle criteria
-- lower-timeframe trigger, such as engulfing confirmation
-- minimum risk/reward requirement, initially configurable with a default of 1:2
-- maximum risk per trade, configurable
-- news/event block, only when a reliable calendar integration is configured
-
-Do not hard-code a universal numeric confidence score unless it is derived from documented, tested rules. If a score is shown, label it as a rule-completion score, not a probability of winning.
 
 ### 6.4 Cross-market applicability
 The user's strategy originates in multi-timeframe price action and liquidity concepts. Do not assume that session liquidity or 1M/15M patterns have equal meaning across stocks, ETFs, crypto, forex, and gold.
@@ -407,51 +366,6 @@ trademate-ai/
     └── fixtures/
 ```
 
-The implementation may adjust filenames where justified, but it must retain separation of concerns and document any material deviation.
-
-## 16. Recommended implementation phases
-
-### Phase 0 — Inspect and plan
-- Inspect the repository and existing code before changing anything.
-- Identify the Python version and environment.
-- Write a concise implementation plan.
-- Ask only for essential missing secrets/provider choices; do not fabricate credentials.
-- Choose a maintained Telegram library and a market-data provider after checking project constraints and provider coverage.
-
-### Phase 1 — Runnable foundation
-- Package/configuration, logging, Telegram `/start` and `/help`, access allowlist, `.env.example`, tests and README.
-- App starts cleanly and reports missing configuration clearly.
-
-### Phase 2 — One provider and normalized data
-- Implement one selected provider adapter.
-- Fetch and validate OHLCV for one representative instrument from each supported asset class if the provider supports them.
-- If the provider does not cover all asset classes, document the gap and define separate adapters without pretending coverage exists.
-
-### Phase 3 — Strategy engine
-- Implement levels and deterministic rule evaluation.
-- Build unit tests with synthetic OHLCV fixtures for bullish, bearish, wait, avoid and insufficient-data cases.
-- Store rule-by-rule evidence in the analysis result.
-- Do not present unvalidated outputs as profitable signals.
-
-### Phase 4 — Telegram analysis
-- Add `/analyze SYMBOL`.
-- Return status, bias, conditions, levels, timestamp, source and data quality.
-- Ensure errors return a friendly response.
-
-### Phase 5 — Risk calculator
-- Add validated risk calculations.
-- Only calculate position size when specifications and required conversions are available.
-- Add tests for direction, invalid stops, quantity rounding and missing metadata.
-
-### Phase 6 — Journal and performance
-- Add SQLite persistence, manual trade logging, history and basic summaries.
-- Test persistence and calculations.
-
-### Phase 7 — AI explanations and hardening
-- Add optional LLM explanation with deterministic fallback.
-- Add rate limits, retries, access controls, health checks and documentation.
-- Run the complete test suite and document remaining limitations.
-
 ## 17. Acceptance criteria
 
 The V1 is ready for private testing when:
@@ -472,11 +386,6 @@ The V1 is ready for private testing when:
 15. Unit and integration tests pass; README documents setup, configuration, commands, limitations and tests.
 
 ---
-
-# OpenCode Build Prompt
-
-You are the senior Python engineer implementing TradeMate AI. Build the application described in `PRD.md` in the current repository.
-
 ## Product constraints
 - TradeMate is a private multi-market trading intelligence and decision-support assistant.
 - V1 markets: forex and gold, cryptocurrency, stocks and ETFs.
@@ -487,41 +396,3 @@ You are the senior Python engineer implementing TradeMate AI. Build the applicat
 - AI may explain structured analysis but must not generate or override strategy decisions.
 - If data, instrument specifications, or critical conditions are missing, fail safely and report the limitation.
 
-## Engineering instructions
-1. First inspect the existing repository, README, dependencies, and tests. Do not overwrite existing work blindly.
-2. Create or update `PRD.md` using the specification above if it is not already present.
-3. Produce a short phased plan, then implement Phase 1 only. Do not attempt to build every feature in one unreviewed pass.
-4. Use a maintained Telegram bot library compatible with the project's Python version. Pin or constrain dependencies appropriately.
-5. Use type hints, small modules, clear domain models, and testable functions.
-6. Keep Telegram handlers thin. Put provider calls, strategy logic, risk calculations, persistence and response formatting in separate modules.
-7. Define a market-data provider interface and implement one provider adapter only after confirming the provider supports the needed symbols/timeframes. Never fake live data. Use fixtures for tests.
-8. Load configuration from environment variables. Create `.env.example` with placeholders only. Never print or commit secrets.
-9. Restrict the bot using `TELEGRAM_ALLOWED_USER_IDS`; fail closed outside explicit development mode if the allowlist is not configured.
-10. Implement clear logs, bounded timeouts/retries, input validation, and friendly errors without leaking internal details.
-11. Add unit tests as you implement each module. Do not wait until the end.
-12. Add no live trading execution, no broker order placement, no automatic trade modification, and no claims of guaranteed results.
-13. Do not introduce an LLM requirement in the first phase. The app must work with deterministic messages if no AI provider is configured.
-14. Avoid unnecessary frameworks, overengineering, and paid services unless they are justified and explicitly configured.
-15. Do not claim a command, test, integration, or feature works unless you actually ran and verified it.
-
-## First task
-Implement **Phase 1 — Runnable foundation** only:
-- project/package structure
-- configuration loading and validation
-- Telegram bot startup
-- `/start` and `/help`
-- allowed-user access control
-- safe logging
-- `.env.example`
-- `.gitignore`
-- basic tests
-- README with setup and run instructions
-
-Before finishing:
-- run the tests and report the actual result
-- show the files created/modified
-- list any setup values the user must supply
-- identify the next smallest implementation step
-- clearly report anything not completed
-
-Do not ask the user for API keys before the foundation is ready. If the current repository already contains useful code, preserve and adapt it.
