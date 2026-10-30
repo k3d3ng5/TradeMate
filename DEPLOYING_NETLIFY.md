@@ -1,9 +1,9 @@
 # Netlify deployment
 
 TradeMate serves its installable PWA from Netlify. A small Render web service
-runs the Python API, and Neon PostgreSQL holds account, invite, session, and
-lesson-progress data. The app's sign-in and invite requirements remain enabled
-on the public Netlify URL.
+runs the Python API. Neon Managed Auth stores account passwords and sessions;
+Neon PostgreSQL stores account roles, invitations, and lesson progress. The
+app's invite requirements remain enabled on the public Netlify URL.
 
 The repository includes a Netlify build script, a same-origin API proxy
 function, and a Render Blueprint. Netlify's build copies only the PWA files to
@@ -12,10 +12,13 @@ static deployment.
 
 ## Create the database
 
-Create a PostgreSQL project in Neon. Copy its pooled connection string and
-add `sslmode=require` if the value does not already include it. The Render API
-uses this as `TRADEMATE_DATABASE_URL`. Keep the value in Render's secret
-environment settings; never add it to this repository.
+The repository is linked to the Neon `TradeMate` project and its `production`
+branch. `neon deploy` provisions Postgres and Managed Auth and pulls their
+settings into the local `.env`. The Render API uses the pooled `DATABASE_URL`
+as `TRADEMATE_DATABASE_URL` and the branch's `NEON_AUTH_BASE_URL`. Keep these
+values in Render's secret environment settings; never commit them. The API
+validates each app session by asking the Managed Auth endpoint for its current
+session, while Postgres stores invited-member roles and course progress.
 
 ## Deploy the Python API
 
@@ -24,6 +27,7 @@ In Render, create a Blueprint from this repository and branch. The included
 environment values during setup:
 
 - `TRADEMATE_DATABASE_URL`: the Neon connection string.
+- `NEON_AUTH_BASE_URL`: the Managed Auth URL from Neon.
 - `TRADEMATE_ADMIN_EMAIL`: the owner's sign-in email.
 - `TRADEMATE_ADMIN_PASSWORD`: a unique password of at least 12 characters.
 

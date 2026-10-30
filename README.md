@@ -5,10 +5,14 @@
 TradeMate also has a private, phone-friendly web app you can install from a
 browser. Each person has their own account. The owner creates a one-use invite
 code from the signed-in app and shares it with a friend; invite codes expire
-after seven days. Passwords are stored as salted scrypt hashes. Sessions use
-HTTP-only cookies, and sign-in attempts are rate-limited.
+after seven days. Neon Managed Auth handles passwords and sessions when Neon is
+configured; standalone SQLite mode stores salted scrypt hashes. Sign-in uses
+HTTP-only cookies and is rate-limited.
 
-For local use on Windows, add `TRADEMATE_ADMIN_EMAIL` and a unique
+When Neon is configured, Neon Managed Auth stores passwords and sessions, and
+Neon Postgres stores account roles, invites, and lesson progress. A standalone
+SQLite setup without Neon uses its local auth tables. For local use on Windows,
+add `TRADEMATE_ADMIN_EMAIL` and a unique
 `TRADEMATE_ADMIN_PASSWORD` of at least 12 characters to `.env` (the example
 settings are in `.env.example`). Keep the password private. Then run:
 
