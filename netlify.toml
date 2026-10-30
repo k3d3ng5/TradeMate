@@ -1,0 +1,11 @@
+[build]
+  command = "node scripts/build-netlify.mjs"
+  publish = "netlify-build"
+
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/static/*"
+  to = "/:splat"
+  status = 200

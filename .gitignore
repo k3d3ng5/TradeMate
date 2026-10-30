@@ -10,5 +10,6 @@ __pycache__/
 .ruff_cache/
 build/
 dist/
+netlify-build/
 *.egg-info/
 

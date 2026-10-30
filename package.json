@@ -1,0 +1,8 @@
+{
+  "name": "trademate-pwa-deploy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-netlify.mjs"
+  }
+}

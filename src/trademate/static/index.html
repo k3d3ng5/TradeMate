@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071a17">
+  <meta name="description" content="Private market insights and risk planning from TradeMate AI.">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="/static/features.css">
+  <title>TradeMate AI</title>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="TradeMate home"><span class="brand-icon">T</span><span>TradeMate<span class="brand-ai"> AI</span></span></a>
+      <button id="install" class="button button-quiet hidden" type="button">Install app</button>
+    </header>
+
+    <section id="auth" class="auth-layout hidden">
+      <div class="welcome">
+        <p class="eyebrow">YOUR PRIVATE TRADING COMPANION</p>
+        <h1>Clear thinking<br><em>before the trade.</em></h1>
+        <p class="muted">Review live market data, possible setups, and risk plans in one calm, focused space.</p>
+        <div class="promise"><span class="promise-check">✓</span><span>Read only. TradeMate never places trades.</span></div>
+      </div>
+      <div class="card auth-card">
+        <div class="auth-tabs"><button id="login-tab" class="auth-tab active" type="button">Sign in</button><button id="register-tab" class="auth-tab hidden" type="button">Create account</button></div>
+        <h2 id="auth-title">Welcome back</h2><p id="auth-hint" class="muted small">Sign in to continue to your workspace.</p>
+        <form id="auth-form">
+          <label>Email address<input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="username" required></label>
+          <label>Password<input id="password" name="password" type="password" placeholder="At least 12 characters" minlength="12" maxlength="128" autocomplete="current-password" required></label>
+          <label id="invite-field" class="hidden">Invite code<input id="invite" name="invite_code" type="text" autocomplete="one-time-code" placeholder="Ask the app owner for an invite"></label>
+          <button id="auth-submit" class="button button-primary full" type="submit">Sign in</button>
+          <p id="auth-message" class="message" role="status"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="workspace" class="hidden">
+      <div class="dashboard-head"><div><p class="eyebrow">YOUR WORKSPACE</p><h1>Good to see you.</h1><p class="muted">A clear view of the market starts here.</p></div><div class="account"><span id="user-email"></span><button id="logout" class="button button-quiet" type="button">Sign out</button></div></div>
+      <div id="owner-card" class="card owner-card hidden"><div><div class="eyebrow">GROW YOUR PRIVATE CIRCLE</div><h2>Invite a friend</h2><p class="muted small">Create a one use code. It expires in 7 days.</p></div><button id="invite-button" class="button button-secondary" type="button">Create invite</button><output id="invite-output" class="invite-output hidden"></output></div>
+      <div class="section-label"><div><p class="eyebrow">MARKET TOOLS</p><h2>What would you like to check?</h2></div><span class="live-pill"><i></i> On demand</span></div>
+      <div class="tool-grid">
+        <article class="card tool-card"><div class="tool-icon">↗</div><p class="eyebrow">MARKET SNAPSHOT</p><h3>Check a price</h3><p class="muted small">See the latest quote and recently completed candles.</p><form class="tool-form" data-tool="market"><label class="sr-only" for="market-symbol">Symbol</label><input id="market-symbol" name="symbol" value="EURUSD" placeholder="e.g. EURUSD" required><button class="button button-primary" type="submit">Check price</button></form></article>
+        <article class="card tool-card"><div class="tool-icon">⌁</div><p class="eyebrow">STRATEGY CHECK</p><h3>Review a setup</h3><p class="muted small">Apply the defined strategy to supported markets.</p><form class="tool-form" data-tool="analyze"><label class="sr-only" for="analyze-symbol">Symbol</label><input id="analyze-symbol" name="symbol" value="EURUSD" placeholder="e.g. EURUSD" required><button class="button button-primary" type="submit">Analyze</button></form></article>
+        <article class="card tool-card"><div class="tool-icon">⌖</div><p class="eyebrow">RISK MANAGER</p><h3>Size a trade idea</h3><p class="muted small">Estimate position size using your stop and verified instrument details.</p><form id="risk-form" class="risk-form"><label>Market<input name="symbol" value="BTCUSDT" required></label><label>Direction<select name="direction"><option value="long">Long / Buy</option><option value="short">Short / Sell</option></select></label><label>Entry<input name="entry" inputmode="decimal" placeholder="Entry price" required></label><label>Stop<input name="stop" inputmode="decimal" placeholder="Stop price" required></label><label>Account balance<input name="equity" inputmode="decimal" placeholder="Balance" required></label><label>Balance currency<input name="equity_currency" value="USDT" required></label><label>Risk % (max 1)<select name="risk_percent"><option value="0.25">0.25%</option><option value="0.5">0.5%</option><option value="1">1%</option></select></label><label>Target (optional)<input name="target" inputmode="decimal" placeholder="Optional"></label><button class="button button-primary" type="submit">Calculate risk</button></form></article>
+        <article class="card tool-card"><div class="tool-icon">◎</div><p class="eyebrow">MARKET SCAN</p><h3>Check a watchlist</h3><p class="muted small">Run a one-time check across symbols from the selected data source.</p><form id="scan-form" class="scan-form"><label>Symbols, separated by commas<input name="symbols" value="BTCUSDT" placeholder="BTCUSDT" required></label><button class="button button-primary" type="submit">Scan markets</button></form></article>
+      </div>
+      <section id="learn-section" class="card learn-card"><div class="learn-heading"><div><p class="eyebrow">LEARN THE BASICS</p><h2>Build your trading knowledge</h2><p class="muted small">Twenty short lessons, with progress saved to your account.</p></div><button id="learn-toggle" class="button button-secondary" type="button">Open course</button></div><div id="course" class="hidden"><div class="course-controls"><label>Lesson<select id="lesson-select"></select></label><span id="course-progress" class="live-pill"></span></div><div class="lesson-panel"><p id="lesson-tier" class="eyebrow"></p><h3 id="lesson-title"></h3><p id="lesson-content" class="lesson-content"></p><div class="quiz"><p id="lesson-question" class="quiz-question"></p><div id="lesson-options" class="quiz-options"></div><p id="lesson-feedback" class="message" role="status"></p></div><div class="lesson-nav"><button id="lesson-prev" class="button button-quiet" type="button">Previous</button><button id="lesson-next" class="button button-secondary" type="button">Next lesson</button></div></div></div></section>
+      <section class="card alert-card"><div><p class="eyebrow">SESSION ALERTS</p><h2>Watch for complete setups</h2><p class="muted small">Checks your watchlist every minute during London and New York sessions while this app is open.</p></div><form id="alert-form"><label>Symbols, separated by commas<input name="symbols" value="BTCUSDT" placeholder="BTCUSDT" required></label><button id="alert-button" class="button button-secondary" type="submit">Start alerts</button></form><p id="alert-status" class="alert-status" role="status">Alerts are off.</p></section>
+      <section id="result-card" class="card result-card hidden"><div class="result-top"><div><p id="result-kicker" class="eyebrow">RESULT</p><h2 id="result-title">Market result</h2></div><button id="close-result" class="icon-button" type="button" aria-label="Close result">×</button></div><div id="result-body" class="result-body"></div><p class="disclaimer">Market data can be delayed or incomplete. A strategy result is not a prediction or a promise. You decide whether to act.</p></section>
+      <footer class="footer"><span>TradeMate AI · WAT (UTC+1)</span><span>Analysis support only · No trades placed</span></footer>
+    </section>
+    <div id="toast" class="toast hidden" role="status"></div>
+  </main>
+  <script src="/static/app.js" defer></script>
+  <script src="/static/features.js" defer></script>
+</body>
+</html>

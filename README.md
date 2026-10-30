@@ -1,12 +1,60 @@
 # TradeMate AI
 
+## Standalone phone app (PWA)
+
+TradeMate also has a private, phone-friendly web app you can install from a
+browser. Each person has their own account. The owner creates a one-use invite
+code from the signed-in app and shares it with a friend; invite codes expire
+after seven days. Passwords are stored as salted scrypt hashes. Sessions use
+HTTP-only cookies, and sign-in attempts are rate-limited.
+
+For local use on Windows, add `TRADEMATE_ADMIN_EMAIL` and a unique
+`TRADEMATE_ADMIN_PASSWORD` of at least 12 characters to `.env` (the example
+settings are in `.env.example`). Keep the password private. Then run:
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+$env:PYTHONPATH = "src"
+$env:TRADEMATE_COOKIE_SECURE = "false"
+python -m trademate.web
+```
+
+Open `http://127.0.0.1:8000` on this computer. For phones and friends outside
+your home network, deploy the app on a host with HTTPS and a persistent disk;
+set the owner credentials and a database path in the host's private
+environment settings. `Dockerfile` is included for a container host. Set
+`TRADEMATE_DB_PATH` to a location on that host's persistent disk. The app
+listens on `127.0.0.1` locally and respects the `PORT` variable supplied by
+most container hosts. PWA installation requires HTTPS (localhost is allowed
+for local development), and passwords must only be sent over HTTPS. The
+standalone app defaults to Binance public data, which currently supports
+BTC/USDT. To use other markets, run the app on the same Windows computer as a
+connected MT5 demo terminal and set `TRADEMATE_MARKET_SOURCE=mt5`. A remote
+Linux host cannot read a terminal on your home computer.
+
+PWA alerts poll only while the signed-in app is open and online, during the
+London (07:00–11:00 WAT) and New York (13:00–17:00 WAT) windows. Browser
+notifications require permission; alerts stop when you sign out. Watchlist
+symbols must be supported by the configured price source. The PWA analysis,
+risk, and learning features share the existing strategy and risk calculations,
+while their interface and saved course progress are separate from Telegram.
+Start the PWA with `python -m trademate.web`.
+For a shareable Netlify site with the Python API and database deployed
+separately, follow [DEPLOYING_NETLIFY.md](DEPLOYING_NETLIFY.md).
+
 The operational signal rules, WAT sessions, supported evidence, confidence-score meaning, and live-data limits are defined in [TRADE_RULES.md](TRADE_RULES.md). The maintained signal logic is `src/trademate/strategy.py`; the root-level `crt_tsq_execution_engine_v2.py` is a retired prototype and is not used by the Telegram bot.
 
-TradeMate AI is a private Telegram companion for careful market analysis,
-beginner-friendly trade planning, and trading education. It helps review risk
-and exit plans, but it does not place, change, or manage trades in the broker.
+TradeMate AI is a private market companion available as a password-protected
+PWA and as a Telegram bot. The PWA includes market snapshots, strategy checks,
+manual risk estimates, one-time watchlist scans, session alerts while the app
+is open, and a 20-lesson beginner course. It does not place, change, or manage
+broker trades.
 
-The market feature can read a price and completed candles from the MT5 desktop
+### Existing Telegram bot
+
+The Telegram market feature can read a price and completed candles from the MT5 desktop
 terminal using `/market SYMBOL` (for example, `/market EURUSD`). `/analyze SYMBOL`
 evaluates the deterministic strategy rules for recognized currency pairs, gold, and BTC/USD
 symbols. It reports a signal, a confidence score based on confirmed conditions,
